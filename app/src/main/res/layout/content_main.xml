@@ -12,27 +12,17 @@
     tools:context="example.org.parkourdemoapp.MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <TextView
-        android:id="@+id/locationData"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        android:layout_alignParentTop="true"
-        android:layout_toLeftOf="@+id/startDataCollection"
-        android:layout_toStartOf="@+id/startDataCollection" />
-
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Collect Location Data"
+        android:text="Start Data Collection"
         android:id="@+id/startDataCollection"
-        android:layout_below="@+id/locationData"
         android:layout_centerHorizontal="true" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Stop Location Data Collection"
+        android:text="Stop  Data Collection"
         android:id="@+id/stopDataCollection"
         android:layout_below="@+id/startDataCollection"
         android:layout_centerHorizontal="true"

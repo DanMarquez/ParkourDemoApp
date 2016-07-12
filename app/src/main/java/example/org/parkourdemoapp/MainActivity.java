@@ -1,7 +1,6 @@
 package example.org.parkourdemoapp;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -17,8 +16,7 @@ import com.parkourmethod.parkour.Listeners.OnLocationChangeListener;
 import com.parkourmethod.parkour.Listeners.OnVenueChangeListener;
 import com.parkourmethod.parkour.Parkour;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.util.List;
 
 public class MainActivity extends Parkour
         implements View.OnClickListener
@@ -29,11 +27,10 @@ public class MainActivity extends Parkour
     private Button stopDataCollection;
     private Button viewLocationData;
     private Button viewVenueData;
-    private final String LOCATION_FILENAME = "user_location_data.txt";
-    private final String VENUE_FILENAME = "user_venue_data.txt";
+
     private boolean collectionStatus = false;
-    FileOutputStream fos1;
-    FileOutputStream fos2;
+
+    private List<LocationEntry> mLocationEntryDataSet;
 
 
 
@@ -74,16 +71,12 @@ public class MainActivity extends Parkour
             @Override
             public void onLocationChanged(Location newLoc, String motionType, String positionType) {
                 String data = "Arrived here: " + newLoc + " motion: " + motionType + " position: " +positionType + "\n";
-                if(collectionStatus){
-                    try{
-                        fos1.write(data.getBytes());
-                    } catch (IOException e) {
-                        Log.e(LOG_TAG, "Unable to write to location file");
-                    }
-
+                if(collectionStatus) {
+                    LocationEntry locationEntry = new LocationEntry(newLoc, motionType, positionType);
+                    LocationActivity.locationDataSet.add(locationEntry);
                 }
-                Log.d(LOG_TAG, "Arrived here: " + newLoc + " motion: " + motionType + " position: " +positionType);
-                //locationData.setText("Arrived here: " + newLoc + " motion: " + motionType + " position: " +positionType);
+                Log.d(LOG_TAG, data);
+
             }
         });
 
@@ -97,14 +90,11 @@ public class MainActivity extends Parkour
                         " Distance: " + dist +
                         " Location:" + userLoc +
                         "\n";
-                if(collectionStatus){
-                    try{
-                        fos2.write(data.getBytes());
-                    } catch(IOException e) {
-                        Log.e(LOG_TAG, "Unable to write to venue file");
-                    }
+                if(collectionStatus) {
+                    VenueEntry venueEntry = new VenueEntry(ven, add, catOne, catTwo, dist, userLoc);
+                    VenueActivity.venueDataSet.add(venueEntry);
                 }
-                Log.d(LOG_TAG, "Venue: " + ven);
+                Log.d(LOG_TAG, data);
             }
         });
 
@@ -139,59 +129,23 @@ public class MainActivity extends Parkour
         Intent intent = null;
         switch(v.getId()) {
             case R.id.startDataCollection:
-                collectionStatus=true;
-                try {
-                    fos1 = openFileOutput(LOCATION_FILENAME, Context.MODE_PRIVATE);
-                }catch(IOException e) {
-                    Log.e(LOG_TAG, LOCATION_FILENAME + " was not found");
+                if(!collectionStatus) {
+                    collectionStatus = true;
+                    parkourSetInterval(5);
+                    parkourStart();
                 }
-                try {
-                    fos2 = openFileOutput(VENUE_FILENAME, Context.MODE_PRIVATE);
-                } catch(IOException e){
-                    Log.e(LOG_TAG, VENUE_FILENAME + " was not found.");
-                }
-                parkourSetInterval(5);
-                parkourStart();
                 break;
             case R.id.stopDataCollection:
-                collectionStatus=false;
-                try {
-                    fos1.write("Here is your data collected: \n".getBytes());
-                    fos2.write("Here is your data collected: \n".getBytes());
-                    fos1.close();
-                    fos2.close();
-                }catch(IOException e){
-                    Log.e(LOG_TAG, "Unable to close data collection.");
+                if(collectionStatus) {
+                    collectionStatus = false;
+                    parkourStop();
                 }
                 break;
             case R.id.viewLocationData:
-                if(collectionStatus) {
-                    collectionStatus = false;
-                    try {
-                        fos1.write("Here is your data collected: \n".getBytes());
-                        fos2.write("Here is your data collected: \n".getBytes());
-                        fos1.close();
-                        fos2.close();
-                    } catch (IOException e) {
-                        Log.e(LOG_TAG, "Unable to close data collection.");
-                    }
-                }
-                intent = new Intent(MainActivity.this, LocationData.class);
-
+                intent = new Intent(MainActivity.this, LocationActivity.class);
                 break;
             case R.id.viewVenueData:
-                if(collectionStatus) {
-                    collectionStatus = false;
-                    try {
-                        fos1.write("Here is your data collected: \n".getBytes());
-                        fos2.write("Here is your data collected: \n".getBytes());
-                        fos1.close();
-                        fos2.close();
-                    } catch (IOException e) {
-                        Log.e(LOG_TAG, "Unable to close data collection.");
-                    }
-                }
-                intent = new Intent(MainActivity.this, VenueData.class);
+                intent = new Intent(MainActivity.this, VenueActivity.class);
                 break;
             default:
         }
