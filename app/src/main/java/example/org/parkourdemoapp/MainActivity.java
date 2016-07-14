@@ -11,16 +11,16 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.parkourmethod.parkour.Listeners.OnLocationChangeListener;
 import com.parkourmethod.parkour.Listeners.OnVenueChangeListener;
 import com.parkourmethod.parkour.Parkour;
 
-import java.util.List;
-
 public class MainActivity extends Parkour
         implements View.OnClickListener
 {
+    private String API_KEY = "AIzaSyCo1dwJ5wi8ljCYDUMdrUcAsoaHEcFmaLM";
     private final int REQUEST_PERMISSION_FINE_LOCATION=1;
     //private TextView locationData;
     private Button startDataCollection;
@@ -28,9 +28,11 @@ public class MainActivity extends Parkour
     private Button viewLocationData;
     private Button viewVenueData;
 
+
+
     private boolean collectionStatus = false;
 
-    private List<LocationEntry> mLocationEntryDataSet;
+    //private List<LocationEntry> mLocationEntryDataSet;
 
 
 
@@ -53,7 +55,7 @@ public class MainActivity extends Parkour
         stopDataCollection.setOnClickListener(this);
         viewLocationData.setOnClickListener(this);
         viewVenueData.setOnClickListener(this);
-        //locationData = (TextView) findViewById(R.id.locationData);
+
 
 
 
@@ -74,6 +76,10 @@ public class MainActivity extends Parkour
                 if(collectionStatus) {
                     LocationEntry locationEntry = new LocationEntry(newLoc, motionType, positionType);
                     LocationActivity.locationDataSet.add(locationEntry);
+                    if(LocationActivity.getmLocationAdapter()!= null){
+                        LocationActivity.getmLocationAdapter().notifyItemInserted(LocationActivity.locationDataSet.size()-1);
+                    }
+
                 }
                 Log.d(LOG_TAG, data);
 
@@ -93,6 +99,9 @@ public class MainActivity extends Parkour
                 if(collectionStatus) {
                     VenueEntry venueEntry = new VenueEntry(ven, add, catOne, catTwo, dist, userLoc);
                     VenueActivity.venueDataSet.add(venueEntry);
+                    if(VenueActivity.getmVenueAdapter()!=null) {
+                        VenueActivity.getmVenueAdapter().notifyItemInserted(VenueActivity.venueDataSet.size()-1);
+                    }
                 }
                 Log.d(LOG_TAG, data);
             }
@@ -131,14 +140,20 @@ public class MainActivity extends Parkour
             case R.id.startDataCollection:
                 if(!collectionStatus) {
                     collectionStatus = true;
-                    parkourSetInterval(5);
+                    //parkourSetInterval(5); // used for testing purposes
                     parkourStart();
+                    Toast.makeText(MainActivity.this, "Data Collection Started", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(MainActivity.this, "Data Collection In Process", Toast.LENGTH_SHORT).show();
                 }
                 break;
             case R.id.stopDataCollection:
                 if(collectionStatus) {
                     collectionStatus = false;
                     parkourStop();
+                    Toast.makeText(MainActivity.this, "Data Collection Stopped", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(MainActivity.this, "No Data Collection In Process", Toast.LENGTH_SHORT).show();
                 }
                 break;
             case R.id.viewLocationData:

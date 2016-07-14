@@ -13,9 +13,11 @@ import java.util.List;
  */
 public class LocationActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
+    private static RecyclerView.Adapter mLocationAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     public static List<LocationEntry> locationDataSet = new ArrayList<>();
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,13 +28,12 @@ public class LocationActivity extends AppCompatActivity {
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mAdapter =new LocationDataAdapter(locationDataSet, LocationActivity.this);
+        mLocationAdapter =new LocationDataAdapter(locationDataSet, LocationActivity.this);
 
-        mRecyclerView.setAdapter(mAdapter);
-
-
+        mRecyclerView.setAdapter(mLocationAdapter);
     }
 
-
-
+    public static RecyclerView.Adapter getmLocationAdapter() {
+        return mLocationAdapter;
+    }
 }
